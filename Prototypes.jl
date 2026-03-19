@@ -11,13 +11,15 @@ end
 function get_slot(obj, name)
     if haskey(obj.slots, name)
         return obj.slots[name]
-    else
-        for parent in obj.parents
-            if haskey(parent.slots, name)
-                return parent.slots[name]
-            end
-        end
+    end    
+
+    for parent in obj.parents
+        try
+            return get_slot(parent, name)
+        catch
+        end  
     end
+    
     error("Slot $name not found")
 end
 
