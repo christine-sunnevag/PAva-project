@@ -9,7 +9,16 @@ function object(; slots...)
 end
 
 function get_slot(obj, name)
-    return obj.slots[name]
+    if haskey(obj.slots, name)
+        return obj.slots[name]
+    else
+        for parent in obj.parents
+            if haskey(parent.slots, name)
+                return parent.slots[name]
+            end
+        end
+    end
+    error("Slot $name not found")
 end
 
 function set_slot!(obj, name, value)
@@ -17,8 +26,24 @@ function set_slot!(obj, name, value)
 end
 
 
-p = object(x=1)
-println(get_slot(p, :x))
+function clone(proto; slots...)
+    new_obj = Object(Dict(slots), [proto])
+    return new_obj
+end
 
-set_slot!(p, :x, 10)
-println(get_slot(p, :x))
+function send(obj, msg, args...)
+    value = get_slot(obj, msg)
+    if value isa Function
+        return value(obj, args...)
+    else
+        return value
+    end
+end
+
+
+dog = object(
+    name="Rex",
+    speak=(self) -> "$(get_slot(self, :name)) says woof"
+)
+
+println(send(dog, :speak))
