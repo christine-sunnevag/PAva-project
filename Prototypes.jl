@@ -338,3 +338,9 @@ function send(obj, msg, args...)
         return dnu(obj, msg, args...)
     end
 end
+
+macro send(obj, msg, args...)
+    return :(send($(esc(obj)), $(QuoteNode(msg)), $(map(esc, args)...)))
+end
+
+
