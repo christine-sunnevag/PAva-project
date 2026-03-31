@@ -163,7 +163,7 @@ set_slot!(lobby, :isA,
             return true_obj
         end
         for p in get_parents(self)
-            if send(p, :isA, proto) == true_obj
+            if send(p, :isA, proto) === true_obj
                 return true_obj
             end
         end
@@ -275,17 +275,21 @@ function to_object(r::AbstractRange)
 
     set_slot!(obj, :do,
         (self, block) -> begin
-            r = get_slot(self, :value)
+            r0 = get_slot(self, :value)
+
             function iter(r)
-                if isempty(r)
-                    nothing
-                else
-                    send(block, :value, first(r))
-                    iter(r[2:end])
-                end
+                send(to_object(isempty(r)), :ifTrueIfFalse,
+                    () -> nothing,
+                    () -> begin
+                        send(block, :value, first(r))
+                        iter(r[2:end])
+                    end
+                )
             end
-            iter(r)
-        end)
+
+            iter(r0)
+        end
+    )
 
     set_slot!(obj, :collect,
         (self) -> begin
@@ -342,5 +346,4 @@ end
 macro send(obj, msg, args...)
     return :(send($(esc(obj)), $(QuoteNode(msg)), $(map(esc, args)...)))
 end
-
 
