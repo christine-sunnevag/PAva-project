@@ -8,8 +8,8 @@ end
 const lobby = Object(Dict{Symbol, Any}(), Object[])
 
 # Declared early so lobby slots can reference them
-true_obj = Object(Dict{Symbol,Any}(), Object[])
-false_obj = Object(Dict{Symbol,Any}(), Object[])
+true_obj = Object(Dict{Symbol,Any}(), [lobby])
+false_obj = Object(Dict{Symbol,Any}(), [lobby])
 
 function object(; slots...)
     Object(Dict(slots), [lobby])
